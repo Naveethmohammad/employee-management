@@ -1,16 +1,17 @@
+ // 📦 Import useEffect, useState, etc. already at the top
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./EmployeeDashboard.css"; // style it as needed
+import "./EmployeeDashboard.css";
 
 const EmployeeDashboard = () => {
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
+  const [editingEmployee, setEditingEmployee] = useState(null); // 👈 for edit
+  const [editForm, setEditForm] = useState({}); // 👈 edit form data
   const navigate = useNavigate();
-
   const token = localStorage.getItem("token");
 
-  // 🔐 Redirect if no token
   useEffect(() => {
     if (!token) {
       navigate("/");
@@ -19,7 +20,6 @@ const EmployeeDashboard = () => {
     }
   }, []);
 
-  // 📦 Fetch employee list
   const fetchEmployees = async () => {
     try {
       const res = await axios.get("http://localhost:5000/api/employees", {
@@ -27,19 +27,57 @@ const EmployeeDashboard = () => {
       });
       setEmployees(res.data.employees);
     } catch (err) {
-      console.error("Fetch failed:", err);
       alert("Failed to fetch employees");
     }
   };
 
-  // 🚪 Logout
+  // ✅ DELETE EMPLOYEE
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this employee?")) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/employees/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchEmployees(); // refresh list
+    } catch (err) {
+      alert("Delete failed");
+    }
+  };
+
+  // ✅ START EDIT MODE
+  const handleEdit = (employee) => {
+    setEditingEmployee(employee._id);
+    setEditForm({ ...employee });
+  };
+
+  // ✅ HANDLE EDIT FORM CHANGE
+  const handleChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  // ✅ SUBMIT EDIT
+  const handleUpdate = async () => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/employees/${editingEmployee}`,
+        editForm,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setEditingEmployee(null);
+      fetchEmployees();
+    } catch {
+      alert("Update failed");
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
   };
 
-  // 🔎 Filtered employees
   const filteredEmployees = employees.filter((emp) =>
     emp.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -76,13 +114,73 @@ const EmployeeDashboard = () => {
           {filteredEmployees.map((emp) => (
             <tr key={emp._id}>
               <td>{emp._id.slice(-4)}</td>
-              <td>{emp.name}</td>
-              <td>{emp.email}</td>
-              <td>{emp.aadhaarNumber}</td>
-              <td>{emp.panCard}</td>
               <td>
-                <button className="edit-btn">Edit</button>
-                <button className="delete-btn">Delete</button>
+                {editingEmployee === emp._id ? (
+                  <input
+                    name="name"
+                    value={editForm.name}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  emp.name
+                )}
+              </td>
+              <td>
+                {editingEmployee === emp._id ? (
+                  <input
+                    name="email"
+                    value={editForm.email}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  emp.email
+                )}
+              </td>
+              <td>
+                {editingEmployee === emp._id ? (
+                  <input
+                    name="aadhaarNumber"
+                    value={editForm.aadhaarNumber}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  emp.aadhaarNumber
+                )}
+              </td>
+              <td>
+                {editingEmployee === emp._id ? (
+                  <input
+                    name="panCard"
+                    value={editForm.panCard}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  emp.panCard
+                )}
+              </td>
+              <td>
+                {editingEmployee === emp._id ? (
+                  <>
+                    <button className="edit-btn" onClick={handleUpdate}>
+                      Save
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => setEditingEmployee(null)}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button className="edit-btn" onClick={() => handleEdit(emp)}>
+                      Edit
+                    </button>
+                    <button className="delete-btn" onClick={() => handleDelete(emp._id)}>
+                      Delete
+                    </button>
+                  </>
+                )}
               </td>
             </tr>
           ))}

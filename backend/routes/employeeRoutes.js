@@ -29,6 +29,7 @@ const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/
 
 
 router.post('/register', async (req, res) => {
+  console.log('Registering employee:', req.body);
   try {
     const { name, email, password, aadhaarNumber, panCard } = req.body;
 

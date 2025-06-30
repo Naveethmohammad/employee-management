@@ -2,7 +2,7 @@
 body, html {
   margin: 0;
   padding: 0;
-  background-color: #ffffff !important; /* Forces white background */
+  background-color: white !important; /* Forces white background */
   color: #000;
-  font-family: 'Poppins', sans-serif;
+  font-family:  Verdana, Geneva, Tahoma, sans-serif;
 }

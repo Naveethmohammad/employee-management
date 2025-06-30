@@ -10,67 +10,56 @@ const LoginForm = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/employees/login",
-        { email, password }
-      );
+      const res = await axios.post("http://localhost:5000/api/employees/login", {
+        email,
+        password,
+      });
 
-      // ✅ Save token and user data
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.employee));
-
-      // ✅ Navigate to employee dashboard
       navigate("/employeeDashboard");
-      return; // stop further execution
     } catch (err) {
-      console.error("❌ Login failed:", err);
-      const message = err.response?.data?.message || "Invalid credentials";
-      alert(message);
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-image">
-        <img src="/login-illustration.png" alt="Login illustration" />
+    <div className="login-page">
+      <div className="login-left">
+        <img src="https://media.istockphoto.com/id/1272623962/vector/website-development-concept-group-of-developers-and-designers-create-website-teamwork.webp?a=1&b=1&s=612x612&w=0&k=20&c=44MzY97312FlyOTdL0V0_LAs5Dg15GRfSxHa5GBssMg=" alt="login" />
       </div>
+      <div className="login-right">
+        <div className="login-card">
+          <h2>Login</h2>
+          <form onSubmit={handleLogin}>
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
 
-      <div className="login-box">
-        <h2>Login</h2>
-        <form onSubmit={handleLogin}>
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-          />
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
-
-          <button type="submit">Sign In</button>
-        </form>
-
-        <p>
-          Don&apos;t have an account?{" "}
-          <span className="signup-link" onClick={() => navigate("/register")}>
-            Create a new account
-          </span>
-        </p>
+            <button type="submit">Sign In</button>
+          </form>
+          <p>
+            Don't have an account?{" "}
+            <span onClick={() => navigate("/register")} className="signup-link">
+              Create a new account
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   );

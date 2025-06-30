@@ -48,7 +48,7 @@ const Register = () => {
     <div className="register-container">
       <div className="register-left">
         <img
-          src="https://cdni.iconscout.com/illustration/premium/thumb/online-registration-8086620-6487633.png"
+          src="https://media.istockphoto.com/id/1360633055/vector/digital-network-connection-illustration-internet-of-things-seo-online-education-platform.webp?a=1&b=1&s=612x612&w=0&k=20&c=21CK_IzQvIYFK8t6YZp9DJQRBKsiGBO2FW9tlQOpnfE="
           alt="Register Illustration"
         />
       </div>
